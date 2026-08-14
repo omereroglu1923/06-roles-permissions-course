@@ -1,39 +1,57 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\Task;
 use App\Models\User;
 use function Pest\Laravel\actingAs;
 
-it('allows administrator to enter update page for any task', function () {
-    $user = User::factory()->create(['is_admin' => true]);
+it('allows administrator to access create task page', function () {
+    $user = User::factory()->administrator()->create();
+
+    actingAs($user)
+        ->get(route('tasks.create'))
+        ->assertOk();
+});
+
+it('does not allow other users to access create task page', function (User $user) {
+    actingAs($user)
+        ->get(route('tasks.create'))
+        ->assertForbidden();
+})->with([
+    fn() => User::factory()->create(['role_id' => Role::User]),
+    fn() => User::factory()->manager()->create(),
+]);
+
+it('allows administrator and manager to enter update page for any task', function (User $user) {
     $task = Task::factory()->create(['user_id' => User::factory()->create()->id]);
 
     actingAs($user)
         ->get(route('tasks.edit', $task))
         ->assertOk();
-});
+})->with([
+    fn() => User::factory()->administrator()->create(),
+    fn() => User::factory()->manager()->create(),
+]);
 
-it('allows administrator to update any task', function () {
-    $user = User::factory()->create(['is_admin' => true]);
+it('allows administrator and manager to update any task', function (User $user) {
     $task = Task::factory()->create(['user_id' => User::factory()->create()->id]);
 
     actingAs($user)
-        ->put(route('tasks.update', $task), [
-            'name' => 'updated task name',
-        ])
+        ->put(route('tasks.update', $task), ['name' => 'updated task name'])
         ->assertRedirect();
 
     expect($task->refresh()->name)->toBe('updated task name');
-});
+})->with([
+    fn() => User::factory()->administrator()->create(),
+    fn() => User::factory()->manager()->create(),
+]);
 
-it('allows user to update his own task', function () {
+it('allows user to update their own task', function () {
     $user = User::factory()->create();
     $task = Task::factory()->create(['user_id' => $user->id]);
 
     actingAs($user)
-        ->put(route('tasks.update', $task), [
-            'name' => 'updated task name',
-        ]);
+        ->put(route('tasks.update', $task), ['name' => 'updated task name']);
 
     expect($task->refresh()->name)->toBe('updated task name');
 });
@@ -43,15 +61,13 @@ it('does not allow user to update other users task', function () {
     $task = Task::factory()->create(['user_id' => User::factory()->create()->id]);
 
     actingAs($user)
-        ->put(route('tasks.update', $task), [
-            'name' => 'updated task name',
-        ])
+        ->put(route('tasks.update', $task), ['name' => 'updated task name'])
         ->assertNotFound();
 });
 
 it('allows administrator to delete task', function () {
-    $user = User::factory()->create(['is_admin' => true]);
     $task = Task::factory()->create(['user_id' => User::factory()->create()->id]);
+    $user = User::factory()->administrator()->create();
 
     actingAs($user)
         ->delete(route('tasks.destroy', $task))
@@ -60,24 +76,22 @@ it('allows administrator to delete task', function () {
     expect(Task::count())->toBe(0);
 });
 
-it('allows user to delete his own task', function () {
-    $user = User::factory()->create();
-    $task = Task::factory()->create(['user_id' => $user->id]);
-
-    actingAs($user)
-        ->delete(route('tasks.destroy', $task))
-        ->assertRedirect();
-
-    expect(Task::count())->toBe(0);
-});
-
-it('does not allow other users to delete tasks', function () {
-    $user = User::factory()->create();
+it('does not allow simple user to delete other tasks', function () {
+    $user = User::factory()->create(['role_id' => Role::User]);
     $task = Task::factory()->create(['user_id' => User::factory()->create()->id]);
 
     actingAs($user)
         ->delete(route('tasks.destroy', $task))
         ->assertNotFound();
+});
+
+it('does not allow manager to delete other tasks', function () {
+    $user = User::factory()->manager()->create();
+    $task = Task::factory()->create(['user_id' => User::factory()->create()->id]);
+
+    actingAs($user)
+        ->delete(route('tasks.destroy', $task))
+        ->assertForbidden();
 });
 
 it('user is unable to see other people tasks', function () {
