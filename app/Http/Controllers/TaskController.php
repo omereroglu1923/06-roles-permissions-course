@@ -20,14 +20,14 @@ class TaskController extends Controller
 
     public function create(): View
     {
-        Gate::authorize('create-task');
+        Gate::authorize('create', Task::class);
 
         return view('tasks.create');
     }
 
     public function store(Request $request): RedirectResponse
     {
-        Gate::authorize('create-task');
+        Gate::authorize('create', Task::class);
 
         Task::create($request->only('name', 'due_date')
             + ['user_id' => Auth::id()]);
@@ -37,14 +37,14 @@ class TaskController extends Controller
 
     public function edit(Task $task): View
     {
-        Gate::authorize('update-task', $task);
+        Gate::authorize('update', $task);
 
         return view('tasks.edit', compact('task'));
     }
 
     public function update(Request $request, Task $task): RedirectResponse
     {
-        Gate::authorize('update-task', $task);
+        Gate::authorize('update', $task);
 
         $task->update($request->only('name', 'due_date'));
 
@@ -53,7 +53,7 @@ class TaskController extends Controller
 
     public function destroy(Task $task): RedirectResponse
     {
-        Gate::authorize('delete-task', $task);
+        Gate::authorize('delete', $task);
 
         $task->delete();
 
