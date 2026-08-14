@@ -36,6 +36,10 @@
                     </flux:sidebar.item>
                 @endif
             </flux:sidebar.group>
+            <flux:sidebar.item icon="clipboard-document-list" :href="route('tasks.index')"
+                :current="request()->routeIs('tasks.*')" wire:navigate>
+                {{ __('Tasks (Gates/Policies)') }}
+            </flux:sidebar.item>
         </flux:sidebar.nav>
 
         <flux:spacer />
