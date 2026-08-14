@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,8 +27,10 @@ class Task extends Model
     protected static function booted()
     {
         self::addGlobalScope(function (Builder $query) {
-            if (Auth::check() && Auth::user()->role_id === Role::User) {
-                $query->where('user_id', Auth::id());
+            $user = Auth::user();
+
+            if ($user && !$user->hasAnyRole([Role::Administrator, Role::Manager])) {
+                $query->where('user_id', $user->id);
             }
         });
     }

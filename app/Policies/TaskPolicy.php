@@ -10,18 +10,17 @@ class TaskPolicy
 {
     public function create(User $user): bool
     {
-        return $user->role_id === Role::Administrator;
+        return $user->hasRole(Role::Administrator);
     }
 
     public function update(User $user, Task $task): bool
     {
-        return $user->role_id === Role::Administrator
-            || $user->role_id === Role::Manager
+        return $user->hasAnyRole([Role::Administrator, Role::Manager])
             || $task->user_id === $user->id;
     }
 
     public function delete(User $user, Task $task): bool
     {
-        return $user->role_id === Role::Administrator;
+        return $user->hasRole(Role::Administrator);
     }
 }

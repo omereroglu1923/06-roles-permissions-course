@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Database\Seeders\RoleSeeder;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,7 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    ->beforeEach(fn() => $this->seed(RoleSeeder::class))
     ->in('Feature');
 
 /*
