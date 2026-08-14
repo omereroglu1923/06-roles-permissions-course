@@ -31,7 +31,6 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role_id' => Role::User,
         ];
     }
 
@@ -48,11 +47,11 @@ class UserFactory extends Factory
     /**
      * Indicate that the model is an administrator.
      */
-    public function administrator(): static
+    public function admin(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'role_id' => Role::Administrator,
-        ]);
+        return $this->afterCreating(function (User $user) {
+            $user->roles()->attach(Role::Administrator->value);
+        });
     }
 
     /**
@@ -60,9 +59,19 @@ class UserFactory extends Factory
      */
     public function manager(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'role_id' => Role::Manager,
-        ]);
+        return $this->afterCreating(function (User $user) {
+            $user->roles()->attach(Role::Manager->value);
+        });
+    }
+
+    /**
+     * Indicate that the model is a simple user.
+     */
+    public function user(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->roles()->attach(Role::User->value);
+        });
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace App\Enums;
 
-namespace App\Enums;
-
 enum Role: int
 {
     case User = 1;

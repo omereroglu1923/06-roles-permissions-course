@@ -26,8 +26,14 @@ class Task extends Model
     protected static function booted()
     {
         self::addGlobalScope(function (Builder $query) {
-            if (Auth::check() && Auth::user()->role_id === Role::User) {
-                $query->where('user_id', Auth::id());
+            $user = Auth::user();
+
+            if (
+                $user
+                && !$user->roles->contains('id', Role::Administrator->value)
+                && !$user->roles->contains('id', Role::Manager->value)
+            ) {
+                $query->where('user_id', $user->id);
             }
         });
     }
