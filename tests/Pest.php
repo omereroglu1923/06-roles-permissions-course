@@ -15,9 +15,11 @@ use Database\Seeders\RoleSeeder;
 |
 */
 
-pest()->extend(TestCase::class)
-    ->use(RefreshDatabase::class)
-    ->beforeEach(fn() => $this->seed(RoleSeeder::class))
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->beforeEach(function () {
+        \Pest\Laravel\seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+    })
     ->in('Feature');
 
 /*
