@@ -35,25 +35,27 @@
                         {{ __('Tasks') }}
                     </flux:sidebar.item>
                 @endif
+
+                @can(\App\Enums\Permission::LIST_TEAM)
+                    <flux:sidebar.item icon="building-office" :href="route('teams.index')"
+                        :current="request()->routeIs('teams.*')" wire:navigate>
+                        {{ __('Clinics') }}
+                    </flux:sidebar.item>
+                @endcan
             </flux:sidebar.group>
             <flux:sidebar.item icon="clipboard-document-list" :href="route('tasks.index')"
                 :current="request()->routeIs('tasks.*')" wire:navigate>
                 {{ __('Tasks (Gates/Policies)') }}
             </flux:sidebar.item>
         </flux:sidebar.nav>
+        
+        <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+            {{ __('Repository') }}
+        </flux:sidebar.item>
 
-        <flux:spacer />
-
-        <flux:sidebar.nav>
-            <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit"
-                target="_blank">
-                {{ __('Repository') }}
-            </flux:sidebar.item>
-
-            <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire"
-                target="_blank">
-                {{ __('Documentation') }}
-            </flux:sidebar.item>
+        <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
+            {{ __('Documentation') }}
+        </flux:sidebar.item>
         </flux:sidebar.nav>
 
         <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />

@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\TeamsPermissionMiddleware;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use App\Models\Task;
-use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +26,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
+        /** @var Kernel $kernel */
+        $kernel = $this->app->make(Kernel::class);
+        $kernel->addToMiddlewarePriorityBefore(
+            TeamsPermissionMiddleware::class,
+            SubstituteBindings::class,
+        );
     }
 
     /**
@@ -41,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn(): ?Password => app()->isProduction()
+            fn (): ?Password => app()->isProduction()
                 ? Password::min(12)
                 ->mixedCase()
                 ->letters()

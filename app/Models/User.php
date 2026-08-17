@@ -15,6 +15,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Spatie\Permission\PermissionRegistrar;
 
 /**
  * @property int $id
@@ -82,6 +84,17 @@ class User extends Authenticatable
 
     public function belongsToTeam(Team $team): bool
     {
-        return $this->teams->contains(fn ($t) => $t->id === $team->id);
+        return $this->teams->contains(fn($t) => $t->id === $team->id);
+    }
+
+    public function rolesWithoutTeam(): MorphToMany
+    {
+        return $this->morphToMany(
+            config('permission.models.role'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            app(PermissionRegistrar::class)->pivotRole
+        );
     }
 }
