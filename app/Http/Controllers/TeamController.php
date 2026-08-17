@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role as RoleModel;
+use Symfony\Component\HttpFoundation\Response;
 
 class TeamController extends Controller
 {
@@ -46,9 +47,25 @@ class TeamController extends Controller
         $user->teams()
             ->attach($team->id, [
                 'model_type' => User::class,
-                'role_id'    => RoleModel::where('name', RoleEnum::ClinicOwner->value)->first()->id,
+                'role_id' => RoleModel::where('name', RoleEnum::ClinicOwner->value)->first()->id,
             ]);
 
         return redirect()->route('teams.index');
+    }
+
+    #[Authorize('changeTeam', Team::class)]
+    public function changeCurrentTeam(int $teamId): RedirectResponse
+    {
+        $team = auth()->user()->teams()->findOrFail($teamId);
+
+        if (! auth()->user()->belongsToTeam($team)) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+
+        auth()->user()->update(['current_team_id' => $team->id]);
+        setPermissionsTeamId($team->id);
+        auth()->user()->unsetRelation('roles')->unsetRelation('permissions');
+
+        return redirect(route('dashboard'), Response::HTTP_SEE_OTHER);
     }
 }

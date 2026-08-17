@@ -17,6 +17,32 @@
             <flux:sidebar.collapse class="lg:hidden" />
         </flux:sidebar.header>
 
+        @can(\App\Enums\Permission::SWITCH_TEAM)
+            <flux:dropdown position="bottom" align="start">
+                <flux:button variant="ghost"
+                    class="group w-full justify-start in-data-flux-sidebar-collapsed-desktop:justify-center">
+                    <flux:icon name="users" class="hidden size-4 in-data-flux-sidebar-collapsed-desktop:block" />
+                    <span
+                        class="truncate font-semibold in-data-flux-sidebar-collapsed-desktop:hidden">{{ Auth::user()->currentTeam->name }}</span>
+                    <flux:icon name="chevrons-up-down" variant="micro"
+                        class="ms-auto size-4 in-data-flux-sidebar-collapsed-desktop:hidden" />
+                </flux:button>
+
+                <flux:menu class="min-w-56">
+                    @foreach (Auth::user()->teams as $team)
+                        <flux:menu.item :href="route('team.change', $team->id)" class="cursor-pointer">
+                            <div class="flex w-full items-center justify-between">
+                                <span>{{ $team->name }}</span>
+                                @if (Auth::user()->current_team_id === $team->id)
+                                    <flux:icon name="check" class="size-4" />
+                                @endif
+                            </div>
+                        </flux:menu.item>
+                    @endforeach
+                </flux:menu>
+            </flux:dropdown>
+        @endcan
+
         <flux:sidebar.nav>
             <flux:sidebar.group :heading="__('Platform')" class="grid">
                 <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
@@ -48,14 +74,19 @@
                 {{ __('Tasks (Gates/Policies)') }}
             </flux:sidebar.item>
         </flux:sidebar.nav>
-        
-        <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-            {{ __('Repository') }}
-        </flux:sidebar.item>
 
-        <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-            {{ __('Documentation') }}
-        </flux:sidebar.item>
+        <flux:spacer />
+
+        <flux:sidebar.nav>
+            <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit"
+                target="_blank">
+                {{ __('Repository') }}
+            </flux:sidebar.item>
+
+            <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire"
+                target="_blank">
+                {{ __('Documentation') }}
+            </flux:sidebar.item>
         </flux:sidebar.nav>
 
         <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />

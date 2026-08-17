@@ -17,6 +17,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('teams', TeamController::class)
         ->only(['index', 'create', 'store']);
 
+    Route::get('team/change/{teamId}', [TeamController::class, 'changeCurrentTeam'])
+        ->name('team.change');
+
     Route::prefix('admin')
         ->name('admin.')
         ->middleware(IsAdminMiddleware::class)
@@ -31,4 +34,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 });
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

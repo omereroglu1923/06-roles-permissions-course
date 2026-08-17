@@ -1,8 +1,9 @@
 <?php
 
+use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
-use Database\Seeders\RoleSeeder;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,10 +16,11 @@ use Database\Seeders\RoleSeeder;
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
     ->beforeEach(function () {
-        \Pest\Laravel\seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->seed(RoleAndPermissionSeeder::class);
     })
     ->in('Feature');
 

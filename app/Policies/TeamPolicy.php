@@ -19,4 +19,9 @@ class TeamPolicy
     {
         return $user->hasPermissionTo(Permission::CREATE_TEAM);
     }
+
+    public function changeTeam(User $user): bool
+    {
+        return $user->hasPermissionTo(Permission::SWITCH_TEAM);
+    }
 }

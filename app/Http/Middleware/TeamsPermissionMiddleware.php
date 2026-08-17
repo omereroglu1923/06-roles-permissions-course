@@ -13,6 +13,7 @@ class TeamsPermissionMiddleware
     {
         if (! empty($user = Auth::user()) && ! empty($user->current_team_id)) {
             setPermissionsTeamId($user->current_team_id);
+            $user->unsetRelation('roles')->unsetRelation('permissions');
         }
 
         return $next($request);
