@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\User;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('tasks', TaskController::class);
 
     Route::resource('teams', TeamController::class)
+        ->only(['index', 'create', 'store']);
+
+    Route::resource('users', UserController::class)
         ->only(['index', 'create', 'store']);
 
     Route::get('team/change/{teamId}', [TeamController::class, 'changeCurrentTeam'])
@@ -34,4 +38,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

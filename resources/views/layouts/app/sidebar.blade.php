@@ -68,6 +68,13 @@
                         {{ __('Clinics') }}
                     </flux:sidebar.item>
                 @endcan
+
+                @can(\App\Enums\Permission::LIST_USER)
+                    <flux:sidebar.item icon="users" :href="route('users.index')"
+                        :current="request()->routeIs('users.*')" wire:navigate>
+                        {{ __('Users') }}
+                    </flux:sidebar.item>
+                @endcan
             </flux:sidebar.group>
             <flux:sidebar.item icon="clipboard-document-list" :href="route('tasks.index')"
                 :current="request()->routeIs('tasks.*')" wire:navigate>
