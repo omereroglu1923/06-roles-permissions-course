@@ -6,7 +6,9 @@ use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Enums\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
@@ -23,16 +25,21 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, [
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
+            'team_id' => ['required', Rule::exists('teams', 'id')->where(fn($q) => $q->where('name', '!=', 'Master Admin Team'))],
         ])->validate();
 
-        $user = User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => $input['password'],
-        ]);
+        return DB::transaction(function () use ($input) {
+            $user = User::create([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'password' => $input['password'],
+                'current_team_id' => $input['team_id'],
+            ]);
 
-        $user->assignRole(Role::User);
+            setPermissionsTeamId($input['team_id']);
+            $user->assignRole(Role::Patient);
 
-        return $user;
+            return $user;
+        });
     }
 }

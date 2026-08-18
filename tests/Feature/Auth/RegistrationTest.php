@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Team;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
@@ -13,11 +14,14 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
+    $team = Team::factory()->create();
+
     $response = $this->post(route('register.store'), [
         'name' => 'John Doe',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'team_id' => $team->id,
     ]);
 
     $response->assertSessionHasNoErrors()
