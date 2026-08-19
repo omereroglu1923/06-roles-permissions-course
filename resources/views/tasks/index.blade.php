@@ -1,6 +1,8 @@
 <x-layouts::app :title="__('Tasks')">
-    <div class="flex h-full w-full flex-1 flex-col gap-4">
+    <div class="flex h-full w-full flex-1 flex-col gap-4 p-6">
         <div class="flex items-center justify-between">
+            <flux:heading size="xl">{{ __('Tasks') }}</flux:heading>
+
             @can('create', \App\Models\Task::class)
                 <flux:button href="{{ route('tasks.create') }}" variant="primary" wire:navigate>
                     {{ __('Add new task') }}
@@ -17,7 +19,10 @@
                             {{ __('Name') }}</th>
                         <th
                             class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                            {{ __('User') }}</th>
+                            {{ __('Assignee') }}</th>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                            {{ __('Patient') }}</th>
                         <th
                             class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                             {{ __('Due Date') }}</th>
@@ -31,9 +36,14 @@
                         <tr>
                             <td class="px-6 py-4 text-sm text-neutral-900 dark:text-neutral-100">{{ $task->name }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-neutral-900 dark:text-neutral-100">{{ $task->user->name }}
+                            <td class="px-6 py-4 text-sm text-neutral-900 dark:text-neutral-100">
+                                {{ $task->assignee?->name }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-neutral-900 dark:text-neutral-100">{{ $task->due_date }}
+                            <td class="px-6 py-4 text-sm text-neutral-900 dark:text-neutral-100">
+                                {{ $task->patient?->name }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-neutral-900 dark:text-neutral-100">
+                                {{ $task->due_date?->format('Y-m-d') }}
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <div class="flex items-center gap-3">

@@ -5,11 +5,7 @@
     @include('partials.head')
 </head>
 
-<body @class([
-    'min-h-screen',
-    'bg-white dark:bg-zinc-800' => !auth()->user()->is_admin,
-    'bg-amber-50 dark:bg-amber-950' => auth()->user()->is_admin,
-])>
+<body class="min-h-screen bg-white dark:bg-zinc-800">
     <flux:sidebar sticky collapsible="mobile"
         class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <flux:sidebar.header>
@@ -50,17 +46,12 @@
                     {{ __('Dashboard') }}
                 </flux:sidebar.item>
 
-                @if (auth()->user()->is_admin)
-                    <flux:sidebar.item icon="check-circle" :href="route('admin.tasks.index')"
-                        :current="request()->routeIs('admin.tasks.index')" wire:navigate>
+                @can(\App\Enums\Permission::LIST_TASK)
+                    <flux:sidebar.item icon="clipboard-document-list" :href="route('tasks.index')"
+                        :current="request()->routeIs('tasks.*')" wire:navigate>
                         {{ __('Tasks') }}
                     </flux:sidebar.item>
-                @else
-                    <flux:sidebar.item icon="check-circle" :href="route('user.tasks.index')"
-                        :current="request()->routeIs('user.tasks.index')" wire:navigate>
-                        {{ __('Tasks') }}
-                    </flux:sidebar.item>
-                @endif
+                @endcan
 
                 @can(\App\Enums\Permission::LIST_TEAM)
                     <flux:sidebar.item icon="building-office" :href="route('teams.index')"
@@ -70,16 +61,12 @@
                 @endcan
 
                 @can(\App\Enums\Permission::LIST_USER)
-                    <flux:sidebar.item icon="users" :href="route('users.index')"
-                        :current="request()->routeIs('users.*')" wire:navigate>
+                    <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')"
+                        wire:navigate>
                         {{ __('Users') }}
                     </flux:sidebar.item>
                 @endcan
             </flux:sidebar.group>
-            <flux:sidebar.item icon="clipboard-document-list" :href="route('tasks.index')"
-                :current="request()->routeIs('tasks.*')" wire:navigate>
-                {{ __('Tasks (Gates/Policies)') }}
-            </flux:sidebar.item>
         </flux:sidebar.nav>
 
         <flux:spacer />
