@@ -29,8 +29,8 @@ class AppServiceProvider extends ServiceProvider
         /** @var Kernel $kernel */
         $kernel = $this->app->make(Kernel::class);
         $kernel->addToMiddlewarePriorityBefore(
-            TeamsPermissionMiddleware::class,
             SubstituteBindings::class,
+            TeamsPermissionMiddleware::class,
         );
     }
 
@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn (): ?Password => app()->isProduction()
+            fn(): ?Password => app()->isProduction()
                 ? Password::min(12)
                 ->mixedCase()
                 ->letters()

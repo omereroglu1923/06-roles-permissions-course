@@ -26,9 +26,12 @@ class TaskController extends Controller
     {
         $assignees = User::whereRelation('roles', 'name', '=', Role::Doctor->value)
             ->orWhereRelation('roles', 'name', '=', Role::Staff->value)
+            ->whereRelation('teams', 'team_id', '=', Auth::user()->current_team_id)
             ->pluck('name', 'id');
 
-        $patients = User::whereRelation('roles', 'name', '=', Role::Patient->value)->pluck('name', 'id');
+        $patients = User::whereRelation('roles', 'name', '=', Role::Patient->value)
+            ->whereRelation('teams', 'team_id', '=', Auth::user()->current_team_id)
+            ->pluck('name', 'id');
 
         return view('tasks.create', compact('assignees', 'patients'));
     }
@@ -48,9 +51,12 @@ class TaskController extends Controller
     {
         $assignees = User::whereRelation('roles', 'name', '=', Role::Doctor->value)
             ->orWhereRelation('roles', 'name', '=', Role::Staff->value)
+            ->whereRelation('teams', 'team_id', '=', Auth::user()->current_team_id)
             ->pluck('name', 'id');
 
-        $patients = User::whereRelation('roles', 'name', '=', Role::Patient->value)->pluck('name', 'id');
+        $patients = User::whereRelation('roles', 'name', '=', Role::Patient->value)
+            ->whereRelation('teams', 'team_id', '=', Auth::user()->current_team_id)
+            ->pluck('name', 'id');
 
         return view('tasks.edit', compact('task', 'assignees', 'patients'));
     }
